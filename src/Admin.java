@@ -3,8 +3,11 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.*;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.LinkedHashMap;
+import java.util.stream.Collectors;
 
 public class Admin {
     private JFrame frame;
@@ -26,18 +29,21 @@ public class Admin {
         adminLabel.setHorizontalAlignment(SwingConstants.CENTER);
         adminPanel.add(adminLabel, BorderLayout.NORTH);
 
+        Map<String, Integer> voteCounts = getVoteCounts();
+
+        // Sort the map by value (vote counts)
+        Map<String, Integer> sortedVoteCounts = voteCounts.entrySet().stream()
+                .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
+
         JPanel votePanel = new JPanel();
         votePanel.setLayout(new BoxLayout(votePanel, BoxLayout.Y_AXIS)); // Align vertically
         votePanel.setBackground(new Color(240, 240, 240)); // Set background color
-        Map<String, Integer> voteCounts = getVoteCounts();
-        int maxVotes = 0;
-        for (int votes : voteCounts.values()) {
-            if (votes > maxVotes) {
-                maxVotes = votes;
-            }
-        }
+
+        int maxVotes = sortedVoteCounts.values().iterator().next(); // Get max votes
+
         boolean tie = false;
-        for (Map.Entry<String, Integer> entry : voteCounts.entrySet()) {
+        for (Map.Entry<String, Integer> entry : sortedVoteCounts.entrySet()) {
             JPanel partyPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 5)); // FlowLayout for party name
             partyPanel.setBackground(new Color(240, 240, 240)); // Set background color
 
@@ -55,29 +61,21 @@ public class Admin {
             partyPanel.add(voteLabel);
             votePanel.add(partyPanel);
         }
-        adminPanel.add(new JScrollPane(votePanel), BorderLayout.CENTER);
+
+        JScrollPane scrollPane = new JScrollPane(votePanel);
+        scrollPane.setPreferredSize(new Dimension(400, 300)); // Set preferred size for the scroll pane
+        adminPanel.add(scrollPane, BorderLayout.CENTER);
 
         JLabel winningLabel;
         if (!tie) {
-            winningLabel = new JLabel("Winning Party: " + determineWinningParty(voteCounts));
+            winningLabel = new JLabel("Winning Party: " + determineWinningParty(sortedVoteCounts));
         } else {
-            winningLabel = new JLabel("Parties running for the final seat: " + winningParty);
+            winningLabel = new JLabel("Party or Parties Winning: " + winningParty);
         }
         winningLabel.setFont(new Font("Arial", Font.BOLD, 16));
         winningLabel.setHorizontalAlignment(SwingConstants.CENTER);
         adminPanel.add(winningLabel, BorderLayout.SOUTH);
 
-
-        JButton returnButton = new JButton("Return to Home Page");
-        returnButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                frame.getContentPane().removeAll();
-                frame.repaint();
-                new VotingManagementSystem();
-            }
-        });
-        adminPanel.add(returnButton, BorderLayout.WEST);
 
         frame.getContentPane().removeAll();
         frame.add(adminPanel);
@@ -111,7 +109,6 @@ public class Admin {
         }
         return voteCounts;
     }
-
 
     private String determineWinningParty(Map<String, Integer> voteCounts) {
         String winningParty = "";

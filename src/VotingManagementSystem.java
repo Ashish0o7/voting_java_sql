@@ -87,61 +87,106 @@ public class VotingManagementSystem {
     private void openRegistrationScreen() {
         JFrame registrationFrame = new JFrame("Registration");
         registrationFrame.setSize(600, 400);
+        registrationFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // Close the application when the frame is closed
+        registrationFrame.setLocationRelativeTo(null); // Center the frame on the screen
 
         JPanel panel = new JPanel();
-        panel.setLayout(new GridLayout(5, 2));
+        panel.setLayout(new GridBagLayout()); // Use GridBagLayout for better control over component placement and spacing
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(10, 10, 10, 10); // Add insets for spacing
 
+        // Email
         JLabel emailLabel = new JLabel("Email:");
-        JTextField emailField = new JTextField();
-        panel.add(emailLabel);
-        panel.add(emailField);
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        panel.add(emailLabel, gbc);
 
+        JTextField emailField = new JTextField(20); // Set preferred width
+        gbc.gridx = 1;
+        gbc.gridy = 0;
+        panel.add(emailField, gbc);
+
+        // Password
         JLabel passwordLabel = new JLabel("Password:");
-        JPasswordField passwordField = new JPasswordField();
-        panel.add(passwordLabel);
-        panel.add(passwordField);
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        panel.add(passwordLabel, gbc);
 
+        JPasswordField passwordField = new JPasswordField(20); // Set preferred width
+        gbc.gridx = 1;
+        gbc.gridy = 1;
+        panel.add(passwordField, gbc);
+
+        // Full Name
         JLabel fullNameLabel = new JLabel("Full Name:");
-        JTextField fullNameField = new JTextField();
-        panel.add(fullNameLabel);
-        panel.add(fullNameField);
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        panel.add(fullNameLabel, gbc);
 
-        JLabel voterIdProofLabel = new JLabel("Voter ID Proof Image Path:");
-        JTextField voterIdProofField = new JTextField();
-        panel.add(voterIdProofLabel);
-        panel.add(voterIdProofField);
+        JTextField fullNameField = new JTextField(20); // Set preferred width
+        gbc.gridx = 1;
+        gbc.gridy = 2;
+        panel.add(fullNameField, gbc);
 
+        // Aadhar Card Number
+        JLabel aadharCardLabel = new JLabel("Aadhar Card Number:");
+        gbc.gridx = 0;
+        gbc.gridy = 3;
+        panel.add(aadharCardLabel, gbc);
+
+        JTextField aadharCardField = new JTextField(20); // Set preferred width
+        gbc.gridx = 1;
+        gbc.gridy = 3;
+        panel.add(aadharCardField, gbc);
+
+        // PAN Card Number
+        JLabel panCardLabel = new JLabel("PAN Card Number:");
+        gbc.gridx = 0;
+        gbc.gridy = 4;
+        panel.add(panCardLabel, gbc);
+
+        JTextField panCardField = new JTextField(20); // Set preferred width
+        gbc.gridx = 1;
+        gbc.gridy = 4;
+        panel.add(panCardField, gbc);
+
+        // Register Button
         JButton registerButton = new JButton("Register");
         registerButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 // Register user
-                registerUser(emailField.getText(), new String(passwordField.getPassword()), fullNameField.getText(), voterIdProofField.getText());
+                registerUser(emailField.getText(), new String(passwordField.getPassword()), fullNameField.getText(), aadharCardField.getText(), panCardField.getText());
             }
         });
-        panel.add(registerButton);
+        gbc.gridx = 0;
+        gbc.gridy = 5;
+        gbc.gridwidth = 2; // Span across two columns
+        gbc.anchor = GridBagConstraints.CENTER; // Center the button
+        panel.add(registerButton, gbc);
 
         registrationFrame.add(panel);
         registrationFrame.setVisible(true);
     }
 
-    private void registerUser(String email, String password, String fullName, String voterIdProofImagePath) {
-        // JDBC connection and insert user data into the database
+    private void registerUser(String email, String password, String fullName, String aadharCardNumber, String panCardNumber) {
+
         Connection connection = null;
         try {
-            // Connect to MySQL database
+
             String jdbcURL = "jdbc:mysql://localhost:3306/voting_management";
             String username = "root";
             String dbPassword = ""; // Rename password variable to avoid conflict
             connection = DriverManager.getConnection(jdbcURL, username, dbPassword);
 
             // Prepare SQL statement
-            String sql = "INSERT INTO users (email, password, full_name, voter_id_proof_path) VALUES (?, ?, ?, ?)";
+            String sql = "INSERT INTO users (email, password, full_name, aadhar_card_number, pan_card_number) VALUES (?, ?, ?, ?, ?)";
             PreparedStatement statement = connection.prepareStatement(sql);
             statement.setString(1, email);
             statement.setString(2, password);
             statement.setString(3, fullName);
-            statement.setString(4, voterIdProofImagePath);
+            statement.setString(4, aadharCardNumber);
+            statement.setString(5, panCardNumber);
 
             // Execute the statement
             int rowsInserted = statement.executeUpdate();
@@ -162,6 +207,7 @@ public class VotingManagementSystem {
             }
         }
     }
+
 
     private void openLoginScreen() {
         JPanel loginPanel = new LoginScreen().getLoginPanel();
