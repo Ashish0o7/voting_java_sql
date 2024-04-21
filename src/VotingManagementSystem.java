@@ -2,7 +2,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.sql.Connection;
+import java.sql.*;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -12,6 +12,15 @@ public class VotingManagementSystem {
     private Connection connection;
 
     public VotingManagementSystem() {
+
+        try {
+            // Load the MySQL JDBC driver
+            Class.forName("com.mysql.cj.jdbc.Driver");
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+            throw new IllegalStateException("Failed to load the MySQL JDBC driver");
+        }
+
         frame = new JFrame("Voting Management System");
         frame.setSize(800, 600);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -176,10 +185,10 @@ public class VotingManagementSystem {
 
             String jdbcURL = "jdbc:mysql://localhost:3306/voting_management";
             String username = "root";
-            String dbPassword = ""; // Rename password variable to avoid conflict
+            String dbPassword = "";
             connection = DriverManager.getConnection(jdbcURL, username, dbPassword);
 
-            // Prepare SQL statement
+
             String sql = "INSERT INTO users (email, password, full_name, aadhar_card_number, pan_card_number) VALUES (?, ?, ?, ?, ?)";
             PreparedStatement statement = connection.prepareStatement(sql);
             statement.setString(1, email);
