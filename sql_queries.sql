@@ -11,8 +11,8 @@ DROP TABLE IF EXISTS users;
 --     full_name VARCHAR(255) NOT NULL, -- Add full_name field
 --     voter_id_proof_path VARCHAR(255) NOT NULL
 -- );
-INSERT INTO users (email, password, full_name, voter_id_proof_path) VALUES ('test@example.com', 'password123', 'John Doe', '/path/to/voter_id_proof.jpg');
-INSERT INTO users (email, password, full_name, voter_id_proof_path) VALUES ('123@gmail.com', 'password123', 'test user', '/path/to/voter_id_qqproof.jpg');
+-- INSERT INTO users (email, password, full_name, voter_id_proof_path) VALUES ('test@example.com', 'password123', 'John Doe', '/path/to/voter_id_proof.jpg');
+-- INSERT INTO users (email, password, full_name, voter_id_proof_path) VALUES ('123@gmail.com', 'password123', 'test user', '/path/to/voter_id_qqproof.jpg');
 CREATE TABLE votes (
                        id INT AUTO_INCREMENT PRIMARY KEY,
                        user_email VARCHAR(255),
